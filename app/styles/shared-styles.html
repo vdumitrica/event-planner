@@ -1,0 +1,63 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<!-- shared styles for all elements and index.html -->
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      :host([signed-in]) {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .page-title {
+        @apply(--paper-font-display2);
+      }
+
+      .app-menu {
+        --paper-menu-selected-item: {
+          color: #fff;
+          background: var(--light-primary-color);
+        }
+      }
+
+      paper-menu a > *, paper-menu paper-item > *, paper-menu paper-icon-item > * {
+        pointer-events: none;
+      }
+
+      @media (max-width: 600px) {
+        .page-title {
+          font-size: 24px!important;
+        }
+      }
+
+      paper-toolbar {
+        --paper-toolbar-background: var(--paper-indigo-500);
+      }
+
+      paper-tab {
+        text-transform: uppercase;
+      }
+
+      .self-end {
+        /* This mixin (from iron-flex-layout) aligns the tabs to the
+           bottom of the toolbar. */
+        @apply(--layout-self-end);
+      }
+
+      .fab-add {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1;
+        transition: top 0.18s ease-in;
+      }
+
+      paper-dialog {
+        /*position: fixed;*/
+        width: 350px;
+        overflow: auto;
+      }
+    </style>
+  </template>
+</dom-module>

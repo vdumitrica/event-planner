@@ -1,0 +1,242 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../elements.html">
+<link rel="import" href="./x-app-behavior.html">
+
+<dom-module id="ep-app">
+	<template>
+		<style is="custom-style" include="shared-styles"></style>
+		<style is="custom-style" include="app-theme"></style>
+
+		<firebase-auth app-name="event-planner" id="auth" signed-in="{{signedIn}}" user="{{user}}" on-error="app.showAuthenticationError"></firebase-auth>
+		
+		<paper-drawer-panel id="paperDrawerPanel">
+		  <!-- Drawer Scroll Header Panel -->
+		  <paper-scroll-header-panel drawer fixed>
+
+		    <!-- Drawer Content -->
+		    <paper-menu class="app-menu" attr-for-selected="data-route" selected="[[route]]">
+		      <a data-route="home" href="{{baseUrl}}">
+		        <iron-icon icon="event"></iron-icon>
+		        <span>Events</span>
+		      </a>
+
+		      <a data-route="users" href="{{baseUrl}}users">
+		        <iron-icon icon="account-circle"></iron-icon>
+		        <span>Users</span>
+		      </a>
+
+		      <a data-route="new-event" href="{{baseUrl}}new-event">
+		        <iron-icon icon="event-add"></iron-icon>
+		        <span>Users</span>
+		      </a>
+
+		      <a data-route="contact" href="{{baseUrl}}contact">
+		        <iron-icon icon="info"></iron-icon>
+		        <span>About</span>
+		      </a>
+		    </paper-menu>
+		  </paper-scroll-header-panel>
+
+		  <!-- Main Area -->
+		  <paper-scroll-header-panel main id="headerPanelMain" condenses scroll-away-topbar keep-condensed-header condensed-header-height="48">
+		    <!-- Main Toolbar -->
+
+
+
+		    <paper-toolbar id="mainToolbar" class="[[computeToolbarClass(!!signedIn)]]">
+		      <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
+
+		      <!-- Application name -->
+		        <div class="title">Event Planner</div>
+
+		      <!-- Toolbar icons -->
+		      <paper-icon-button hidden$="[[signedIn]]" id="userLogin" icon="lock" onclick="loginDialog.open()">Log in</paper-icon-button>
+		      <paper-icon-button hidden$="[[signedIn]]" id="userSignup" icon="account-circle">Sign up</paper-icon-button>
+
+		      <paper-icon-button hidden$="[[!signedIn]]" icon="refresh"></paper-icon-button>
+		      <paper-icon-button hidden$="[[!signedIn]]" id="userLogout" icon="lock-open">Log out</paper-icon-button>
+
+		      <!-- Application sub title -->
+		      <paper-tabs hidden$="[[!signedIn]]" class="bottom self-end" selected="0" scrollable fit-container style="width:100%">
+		        <paper-tab>All</paper-tab>
+		        <paper-tab>Upcoming</paper-tab>
+		        <paper-tab>Past</paper-tab>
+		      </paper-tabs>
+		    </paper-toolbar>
+
+
+		    <!-- Main Content -->
+		    <div class="content">
+		      <paper-fab class="fab-add" icon="add" title="Add Event" onclick="addEventDialog.open()"></paper-fab>
+
+		      <iron-list id="list" items="[[_generateGroupsFor(items)]]" scroll-target="document">
+		        <template>
+		          <div>
+		            <div class="group-header" hidden$="[[!_hasGroup(index)]]">[[item.state]]</div>
+		            <div class="group-item">
+		              <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
+		              <div class="pad">
+		                <span class="primary">[[item.name]]</span> <span class="secondary">[[item.shortText]]</span>
+		              </div>
+		            </div>
+		          </div>
+		        </template>
+		      </iron-list>
+
+		      <iron-pages attr-for-selected="data-route" selected="{{route}}">
+		        <section data-route="home" tabindex="-1">
+		          <event-list signed-in="{{signedIn}}"></event-list>
+		          
+		          <paper-material elevation="1">
+		            <my-greeting></my-greeting>
+
+		            <p class="subhead">You now have:</p>
+		            <my-list></my-list>
+
+		            <p>Looking for more Web App layouts? Check out our <a href="https://github.com/PolymerElements/app-layout-templates">layouts</a> collection. You can also <a href="http://polymerelements.github.io/app-layout-templates/">preview</a> them live.</p>
+		          </paper-material>
+
+		          <paper-material elevation="1">
+		            <p>This is another card.</p>
+		          </paper-material>
+
+
+		          <paper-material elevation="1">
+		            <div role="listbox">
+		              <paper-listbox>
+		              <paper-item>
+		                <div class="avatar blue" item-icon></div>
+		                <paper-item-body two-line>
+		                  <div>Photos</div>
+		                  <div secondary>Jan 9, 2014</div>
+		                </paper-item-body>
+		                <paper-icon-button icon="star" alt="favourite this!">
+		                </paper-icon-button>
+		              </paper-item>
+		              <paper-item>
+		                <div class="avatar" item-icon></div>
+		                <paper-item-body two-line>
+		                  <div>Recipes</div>
+		                  <div secondary>Jan 17, 2014</div>
+		                </paper-item-body>
+		                <paper-icon-button icon="star" alt="favourite this!">
+		                </paper-icon-button>
+		              </paper-item>
+		              </paper-listbox>
+		            </div>
+		          </paper-material>
+		        </section>
+
+		        <section data-route="users" tabindex="-1">
+		          <paper-material elevation="1">
+		            <h1 class="page-title" tabindex="-1">Users</h1>
+		            <p>This is the users section</p>
+		            <a href$="{{baseUrl}}users/Addy">Addy</a><br>
+		            <a href$="{{baseUrl}}users/Rob">Rob</a><br>
+		            <a href$="{{baseUrl}}users/Chuck">Chuck</a><br>
+		            <a href$="{{baseUrl}}users/Sam">Sam</a>
+		          </paper-material>
+		        </section>
+
+		        <section data-route="user-info" tabindex="-1">
+		          <paper-material elevation="-1">
+		            <h1 class="page-title" tabindex="-1">User: {{params.name}}</h1>
+		            <div>This is {{params.name}}'s section</div>
+		          </paper-material>
+		        </section>
+
+		        <section data-route="contact" tabindex="-1">
+		          <paper-material elevation="1">
+		            <h1 class="page-title" tabindex="-1">Contact</h1>
+		            <p>This is the contact section</p>
+		          </paper-material>
+		        </section>
+
+		        <section data-route="new-event" tabindex="-1">
+		          <paper-material elevation="1">
+		            <h2>New Event</h2>
+		          <form is="iron-form" id="form" method="post" action="/form/handler">
+		            <paper-input label="Event Name" placeholder="Add a short, clear name" required></paper-input>
+		            <paper-dropdown-menu label="Event Type" no-animations>
+		              <paper-listbox class="dropdown-content">
+		                <paper-item>Birthday Party</paper-item>
+		                <paper-item>Conference Talk</paper-item>
+		                <paper-item>Concert</paper-item>
+		              </paper-listbox>
+		            </paper-dropdown-menu>
+		            <paper-input label="Event Host" placeholder="Individual or Organization Name" required></paper-input>
+		            <paper-input label="Date/Time" placeholder="Choose a date and time" required type="datetime">
+		              <input is="iron-input" bind-value="{{myValue}}" type="datetime">
+		            </paper-input>
+		          </form>
+		          </paper-material>
+		        </section>
+		      </iron-pages>
+		    </div>
+		  </paper-scroll-header-panel>
+		</paper-drawer-panel>
+
+		<paper-dialog id="addEventDialog" modal auto-fit-on-attach dynamic-align restore-focus-on-close>
+		  <h2>New Event</h2>
+
+
+
+
+
+		  <div class="buttons">
+		    <paper-button dialog-dismiss>Cancel</paper-button>
+		    <paper-button dialog-confirm autofocus>Add Event</paper-button>
+		  </div>
+		</paper-dialog>
+
+		<paper-dialog id="loginDialog" modal auto-fit-on-attach dynamic-align restore-focus-on-close>
+		  <h2>Log in</h2>
+
+		  <form is="iron-form" id="form" method="post" on-submit="app.signInWithEmailAndPassword">
+		    <paper-input label="Email" type="email" placeholder="Your email address, e.h. user@domain.com" required></paper-input>
+		    <paper-input label="Password" type="password" placeholder="Your password" required></paper-input>
+		  </form>
+
+		  <div class="buttons">
+		    <paper-button dialog-dismiss>Cancel</paper-button>
+		    <paper-button dialog-confirm autofocus onclick="app.signInWithEmailAndPassword()">Log in</paper-button>
+		  </div>
+		</paper-dialog>
+
+		<paper-toast id="toast">
+		  <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+		</paper-toast>
+	</template>
+	<script>
+		(() => {
+			'use strict';
+
+			Polymer({
+				is: 'ep-app',
+
+				behaviors: [Polymer.EventPlannerAppBehavior],
+
+				computeToolbarClass: function(signedIn) {
+					return signedIn ? 'medium-tall' : 'tall';
+				},
+
+				get isEditable() {
+					return this.online;
+				},
+
+				get eventsPath() {
+					return `/events/${this.user.uid}`;
+				},
+
+				toEditableId(eventId) {
+					return `${this.eventsPath}/${eventId}`;
+				},
+
+				signIn() {
+					this.$.auth.signInWithPopup();
+				}
+			});
+		})();
+	</script>
+</dom-module>

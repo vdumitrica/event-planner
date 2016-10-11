@@ -1,0 +1,70 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/app-storage/app-network-status-behavior.html">
+
+<dom-module id="event-list">
+	<template>
+		<api-user value={{user}}></api-user>
+		<style>
+			:host {
+				display: block;
+			}
+
+			span {
+				@apply(--paper-font-body1);
+			}
+		</style>
+
+		<template is="dom-if" if="{{signedIn}}">
+			<ul>
+				<template is="dom-repeat" items="{{events}}" as="{{event}}">
+					<li><span>{{item}}</span></li>
+				</template>
+			</ul>
+		</template>
+
+		<template is="dom-if" if="{{!signedIn}}">
+			<paper-material>
+				<p>Please sign in or create an account to add events</p>
+			</paper-material>
+		</template>
+	</template>
+
+	<script>
+		(function() {
+			'use strict';
+
+			Polymer({
+				is: 'event-list',
+
+				properties: {
+					user: Object,
+
+					events: {
+						type: Array,
+						notify: true
+					}
+				},
+
+				behaviors: [
+				  Polymer.AppNetworkStatusBehavior
+				],
+
+				ready: function() {
+					this.user = {
+						isLoggedIn: false
+					};
+
+					this.events = [
+						'Responsive Web App boilerplate',
+						'Iron Elements and Paper Elements',
+						'End-to-end Build Tooling (including Vulcanize)',
+						'Unit testing with Web Component Tester',
+						'Routing with Page.js',
+						'Offline support with the Platinum Service Worker Elements'
+					];
+				}
+			});
+		})();
+	</script>
+</dom-module>
