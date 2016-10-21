@@ -65,11 +65,11 @@
 		      </paper-tabs>
 		    </paper-toolbar>
 
-
 		    <!-- Main Content -->
 		    <div class="content">
-		      <paper-fab class="fab-add" icon="add" title="Add Event" onclick="addEventDialog.open()"></paper-fab>
+		      <paper-fab class="fab-add" icon="add" title="Add Event" onclick="addEventDialog.open()" hidden$=[[!signedIn]]></paper-fab>
 
+<!--
 		      <iron-list id="list" items="[[_generateGroupsFor(items)]]" scroll-target="document">
 		        <template>
 		          <div>
@@ -83,12 +83,19 @@
 		          </div>
 		        </template>
 		      </iron-list>
+-->
 
 		      <iron-pages attr-for-selected="data-route" selected="{{route}}">
 		        <section data-route="home" tabindex="-1">
-		          <event-list signed-in="{{signedIn}}"></event-list>
+			        <ep-login
+			            on-sign-in="signIn"
+			            signed-in="[[signedIn]]"
+			            disabled="[[!online]]">
+			        </ep-login>
+
+		          <event-list signed-in="[[signedIn]]" hidden$=[[!signedIn]]></event-list>
 		          
-		          <paper-material elevation="1">
+		          <paper-material elevation="1" hidden$=[[!signedIn]]>
 		            <my-greeting></my-greeting>
 
 		            <p class="subhead">You now have:</p>
@@ -97,12 +104,12 @@
 		            <p>Looking for more Web App layouts? Check out our <a href="https://github.com/PolymerElements/app-layout-templates">layouts</a> collection. You can also <a href="http://polymerelements.github.io/app-layout-templates/">preview</a> them live.</p>
 		          </paper-material>
 
-		          <paper-material elevation="1">
+		          <paper-material elevation="1" hidden$=[[!signedIn]]>
 		            <p>This is another card.</p>
 		          </paper-material>
 
 
-		          <paper-material elevation="1">
+		          <paper-material elevation="1" hidden$=[[!signedIn]]>
 		            <div role="listbox">
 		              <paper-listbox>
 		              <paper-item>
